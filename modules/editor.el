@@ -43,4 +43,6 @@
    ("C-<up>" . paredit-splice-sexp-killing-backward)
    ("C-<down>" . paredit-splice-sexp-killing-forward)))
 
+(use-package expand-region)
+
 (provide 'editor)
