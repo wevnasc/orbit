@@ -1,8 +1,4 @@
 ;;; init.el -*- lexical-binding: t; -*-
-
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-(setq exec-path (append exec-path '("/usr/local/bin")))
-
 (setq orbit/theme           'doom-old-hope
       orbit/font-family     "JetBrains Mono"
       orbit/font-size       14
