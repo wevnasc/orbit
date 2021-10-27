@@ -21,28 +21,34 @@
 
   ;; usage of space as leader key
   (general-create-definer orbit/leader-key
-    :keymaps '(normal visual emacs)
+    :states '(normal visual emacs)
     :prefix "SPC")
 
   (general-create-definer orbit/project-key
-    :keymaps '(normal visual emacs)
+    :states '(normal visual emacs)
     :prefix "SPC p")
 
   (general-create-definer orbit/buffer-key
-    :keymaps '(normal visual emacs)
+    :states '(normal visual emacs)
     :prefix "SPC b")
 
   (general-create-definer orbit/lsp-key
-    :keymaps '(normal visual emacs)
-    :prefix "SPC c")
+    :states  '(normal visual emacs)
+    :keymaps 'override
+    :prefix  "SPC c")
 
   (general-create-definer orbit/git-key
-    :keymaps '(normal visual emacs)
+    :states '(normal visual emacs)
     :prefix "SPC g")
 
   (general-create-definer orbit/tools-key
-    :keymaps '(normal visual emacs)
-    :prefix "SPC t") 
+    :states '(normal visual emacs)
+    :prefix "SPC t")
+
+  (general-create-definer orbit/language-key
+    :states  '(normal visual emacs)
+    :keymaps 'override
+    :prefix  "SPC m")
 
   (orbit/leader-key
     "."  '(coursel-find-file     :which-key "Find file")
@@ -88,6 +94,7 @@
     "p" '(previous-buffer     :which-key "Previous buffer"))
 
   (orbit/lsp-key
+    :keymaps 'lsp-mode-map
     ""   '(:ignore t                    :which-key "lsp")
     "a"  '(lsp-execute-code-action      :which-key "Code action")
     "d"  '(lsp-doctor                   :which-key "Doctor")
@@ -109,6 +116,42 @@
 
   (orbit/tools-key
     ""   '(:ignore t             :which-key "tools")
-    "t"  '(counsel-load-theme    :which-key "Load theme")))
+    "t"  '(counsel-load-theme    :which-key "Load theme"))
+
+  ;; cider jack
+  (orbit/language-key
+    "j"  '(:ignore t                                   :which-key "jack")
+    "ji" '(cider-jack-in                               :which-key "Start repl")
+    "jj" '(cider-jack-in-clj                           :which-key "Start clojure repl")
+    "jI" '(cider-jack-in-cljs                          :which-key "Start clojurescript repl")
+    "jJ" '(cider-jack-in-clj&cljs                      :which-key "Start clojure and clojurescript repl"))
+
+  ;; cider
+  (orbit/language-key
+    :keymaps 'cider-mode-map
+    "e"  '(:ignore t                                   :which-key "eval")
+    "ea" '(cider-eval-all-files                        :which-key "Evaluate all files")
+    "eb" '(cider-eval-buffer                           :which-key "Evaluate buffer")
+    "er" '(cider-eval-region                           :which-key "Evaluate region")
+    "ee" '(cider-eval-last-sexp                        :which-key "Evaluate last expression")
+    "l"  '(:ignore t                                   :which-key "load")
+    "lb" '(cider-load-buffer                           :which-key "Load buffer")
+    "ls" '(cider-load-buffer-and-switch-to-repl-buffer :which-key "Loan buffer on repl")
+    "la" '(cider-load-all-files                        :which-key "Load all files")
+    "r"  '(:ignore t                                   :which-key "repl")
+    "rb" '(cider-switch-to-repl-buffer                 :which-key "Switch to repl buffer")
+    "rq" '(cider-quit                                  :which-key "Kill repl buffer")
+    "t"  '(:ignore t                                   :which-key "test")
+    "tt" '(cider-test-run-test                         :which-key "Run tests")
+    "tr" '(cider-test-rerun-failed-tests               :which-key "Re run failed tests")
+    "tn" '(cider-test-run-ns-tests                     :which-key "Run namespace tests")
+    "tp" '(cider-test-run-project-tests                :which-key "Run project tests")
+    "tl" '(cider-test-run-loaded-tests                 :which-key "Run loaded tests"))
+
+  ;; cider repl
+  (orbit/language-key
+    :keymaps 'cider-repl-mode-map 
+    "r"  '(:ignore t                                   :which-key "repl")
+    "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer")))
 
 (provide 'keybind)
