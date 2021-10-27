@@ -1,5 +1,5 @@
 ;;; init.el -*- lexical-binding: t; -*-
-(setq orbit/theme           'doom-old-hope
+(setq orbit/theme           'doom-Iosvkem
       orbit/font-family     "JetBrains Mono"
       orbit/font-size       14
       orbit/project-folders '("~/dev/nu" "~/dev/projects"))
@@ -11,5 +11,6 @@
 (require 'search)
 (require 'project)
 (require 'editor)
+(require 'lang)
 (require 'tools)
 (require 'keybind)
