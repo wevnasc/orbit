@@ -45,4 +45,18 @@
 
 (use-package expand-region)
 
+(use-package company
+  :commands global-company-mode
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-tooltip-limit 10
+        company-idle-delay 0.2
+        company-echo-delay 0
+        company-minimum-prefix-length 2
+        company-require-match nil
+        company-selection-wrap-around t
+        company-tooltip-align-annotations t
+        company-tooltip-flip-when-above t
+        company-transformers '(company-sort-by-occurrence)))
+
 (provide 'editor)

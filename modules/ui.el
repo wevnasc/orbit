@@ -8,6 +8,7 @@
 (menu-bar-mode -1)                        ; Disable the menu bar
 (global-display-line-numbers-mode t)      ; Enable line numbers
 (show-paren-mode t)                       ; highlight paren
+(electric-pair-mode 1)                    ; close paren automatically
 (setq mac-command-modifier 'control)      ; Mac OS control to command
 (setq visible-bell nil)                   ; Set up the visible bell
 
