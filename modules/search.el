@@ -34,6 +34,15 @@
   :init
   (ivy-rich-mode 1))
 
+;; Sort by history
+(use-package prescient
+  :config
+  (prescient-persist-mode 1))
+
+(use-package ivy-prescient
+  :config
+  (ivy-prescient-mode 1))
+
 ;; Make easy to find shortcuts
 (use-package which-key
   :defer 0
