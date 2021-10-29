@@ -15,7 +15,6 @@
 ;; Maximize screen
 (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
-;; Disable line numbers for some follow modes
 (dolist (mode '(org-mode-hook
                 term-mode-hook
                 shell-mode-hook
@@ -25,11 +24,11 @@
 
 ;; Font
 (set-face-attribute 'default nil :font orbit/font-family :height (* 10 orbit/font-size))
+(set-face-attribute 'variable-pitch nil :font orbit/font-family :height (* 10 13))
 
 ;; do after:  M-x all-the-icons-install-fonts
 (use-package all-the-icons)
 
-;; A more nicer botton line
 (use-package doom-modeline
   :init
   (doom-modeline-mode 1)
@@ -39,12 +38,11 @@
 (use-package doom-themes
   :config
   (load-theme orbit/theme t)
-  ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    
         doom-themes-enable-italic t)
-  ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  ;; Corrects (and improves) org-mode's native fontification.
+  (setq doom-themes-treemacs-theme "doom-colors")  
+  (doom-themes-treemacs-config)
   (doom-themes-org-config))
 
 (provide 'ui)

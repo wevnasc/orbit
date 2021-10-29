@@ -21,35 +21,41 @@
 
   ;; usage of space as leader key
   (general-create-definer orbit/leader-key
-    :states '(normal visual emacs)
+    :states '(normal visual emacs treemacs)
+    :keymaps 'override
     :prefix "SPC")
 
   (general-create-definer orbit/project-key
-    :states '(normal visual emacs)
+    :states '(normal visual emacs treemacs)
     :prefix "SPC p")
 
   (general-create-definer orbit/buffer-key
-    :states '(normal visual emacs)
+    :states '(normal visual emacs treemacs)
     :prefix "SPC b")
 
   (general-create-definer orbit/lsp-key
-    :states  '(normal visual emacs)
+    :states  '(normal visual emacs treemacs)
     :keymaps 'override
     :prefix  "SPC c")
 
   (general-create-definer orbit/git-key
-    :states '(normal visual emacs)
+    :states '(normal visual emacs treemacs)
     :prefix "SPC g")
 
   (general-create-definer orbit/tools-key
-    :states '(normal visual emacs)
+    :states '(normal visual emacs treemacs)
     :prefix "SPC t")
 
   (general-create-definer orbit/language-key
-    :states  '(normal visual emacs)
+    :states  '(normal visual emacs treemacs)
     :keymaps 'override
     :prefix  "SPC m")
 
+  (general-create-definer orbit/open-key
+    :states  '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix  "SPC o")
+  
   (orbit/leader-key
     "."  '(coursel-find-file     :which-key "Find file")
     ","  '(switch-to-buffer      :which-key "Switch buffer")
@@ -59,6 +65,11 @@
     "w"  '(evil-window-map       :which-key "window")
     "wd" '(evil-window-delete    :which-key "Delete window"))
 
+  (orbit/leader-key
+    :keymaps 'treemacs-mode-map
+    "w"  '(evil-window-map       :which-key "window")
+    "wd" '(evil-window-delete    :which-key "Delete window"))
+  
   (orbit/project-key
     ""  '(:ignore t                                  :which-key "project")
     "!" '(projectile-run-shell-command-in-root       :which-key "Run cmd in project root")
@@ -152,6 +163,9 @@
   (orbit/language-key
     :keymaps 'cider-repl-mode-map 
     "r"  '(:ignore t                                   :which-key "repl")
-    "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer")))
+    "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer"))
+
+  (orbit/open-key
+   "p"   '(orbit/treemacs-toggle                       :which-key "Toggle project sidebar")))
 
 (provide 'keybind)
