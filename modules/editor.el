@@ -26,13 +26,13 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package paredit
-  :init
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'scheme-mode-hook #'paredit-mode)
+  :hook
+  (emacs-lisp-mode . paredit-mode)
+  (eval-expression-minibuffer-setup . paredit-mode)
+  (ielm-mode . paredit-mode)
+  (lisp-mode . paredit-mode)
+  (lisp-interaction-mode . paredit-mode)
+  (scheme-mode . paredit-mode)
   :bind
   (("M-{" . paredit-wrap-curly)
    ("M-[" . paredit-wrap-square)
@@ -43,7 +43,8 @@
    ("C-<up>" . paredit-splice-sexp-killing-backward)
    ("C-<down>" . paredit-splice-sexp-killing-forward)))
 
-(use-package expand-region)
+(use-package expand-region
+  :after evil)
 
 (use-package company
   :commands global-company-mode

@@ -11,6 +11,7 @@
 ;; Generic completion mechanism for Emacs
 (use-package ivy
   :diminish
+  :commands counsel-M-x
   :bind
   (("C-s" . swiper)
    :map ivy-minibuffer-map
@@ -34,12 +35,8 @@
   :init
   (ivy-rich-mode 1))
 
-;; Sort by history
-(use-package prescient
-  :config
-  (prescient-persist-mode 1))
-
 (use-package ivy-prescient
+  :after ivy
   :config
   (ivy-prescient-mode 1))
 

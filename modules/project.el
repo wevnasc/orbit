@@ -32,14 +32,14 @@
 
 (use-package treemacs
   :defer t
+  :hook (projectile-after-switch-project . orbit/treemacs-show-current-project)
   :config
   (setq treemacs-collapse-dirs              0
         treemacs-silent-refresh             t
         treemacs-is-never-other-window      t)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode 'always)
-  (add-hook 'projectile-after-switch-project-hook 'orbit/treemacs-show-current-project))
+  (treemacs-fringe-indicator-mode 'always))
 
 (use-package treemacs-evil
   :after (treemacs evil))
@@ -49,8 +49,5 @@
 
 (use-package treemacs-magit
   :after (treemacs magit))
-
-(use-package lsp-treemacs
-  :after (treemacs lsp))
 
 (provide 'project)

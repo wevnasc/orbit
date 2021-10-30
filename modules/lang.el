@@ -1,7 +1,9 @@
 ;;; lang.el -*- lexical-binding: t; -*-
 
 ;; Clojure
-(use-package clojure-mode)
+(use-package clojure-mode
+  :defer t
+  :hook (clojure-mode . lsp-deferred))
 
 (use-package cider
   :commands cider-mode
@@ -12,12 +14,9 @@
 
 ;; LSP
 (use-package lsp-mode
-  :after (evil which-key)
   :init
   (setq lsp-keymap-prefix "C-l")
-  :hook ((clojure-mode . lsp)
-	 (lisp-mode . lsp))
-  :commands lsp
+  :commands (lsp lsp-deferred)
   :config
   (setq lsp-headerline-breadcrumb-enable nil
 	lsp-modeline-diagnostics-enable t
@@ -25,12 +24,17 @@
   (lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
+  :after lsp
   :commands lsp-ui-mode
   :config
   (setq lsp-ui-doc-delay 3))
 
 (use-package lsp-ivy
+  :after lsp
   :commands lsp-ivy-workspace-symbol)
+
+(use-package lsp-treemacs
+  :after lsp)
 
 ;; Flycheck
 (use-package flycheck
@@ -44,6 +48,7 @@
   :hook
   (flycheck-mode . flycheck-popup-tip-mode))
 
-(use-package flycheck-clj-kondo)
+(use-package flycheck-clj-kondo
+  :after flycheck)
 
 (provide 'lang)

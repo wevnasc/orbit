@@ -1,5 +1,9 @@
+;;; package --- usuful tools
 ;;; tools.el -*- lexical-binding: t; -*-
-;; Better documentation for emacs functions
+;;; Commentary:
+
+;;; Code:
+
 (use-package helpful
   :commands
   (helpful-callable helpful-variable helpful-command helpful-key)
@@ -21,3 +25,4 @@
 
 
 (provide 'tools)
+;;; tools.el ends here

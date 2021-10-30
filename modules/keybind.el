@@ -2,7 +2,6 @@
 (use-package general
   :after evil
   :config
- 
   ;; global keybinds
   (general-define-key
    "C-+" 'text-scale-increase

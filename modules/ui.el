@@ -24,6 +24,7 @@
 
 ;; Font
 (set-face-attribute 'default nil :font orbit/font-family :height (* 10 orbit/font-size))
+(set-face-attribute 'fixed-pitch nil :font orbit/font-family :height (* 10 orbit/font-size))
 (set-face-attribute 'variable-pitch nil :font orbit/font-family :height (* 10 13))
 
 ;; do after:  M-x all-the-icons-install-fonts
