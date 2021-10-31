@@ -54,6 +54,10 @@
     :states  '(normal visual emacs treemacs)
     :keymaps 'override
     :prefix  "SPC o")
+
+  (general-create-definer orbit/helper-key
+    :states  '(normal visual emacs treemacs)
+    :prefix  "SPC h")
   
   (orbit/leader-key
     "."  '(coursel-find-file     :which-key "Find file")
@@ -165,6 +169,12 @@
     "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer"))
 
   (orbit/open-key
-   "p"   '(orbit/treemacs-toggle                       :which-key "Toggle project sidebar")))
+    "p"   '(orbit/treemacs-toggle                       :which-key "Toggle project sidebar"))
+
+  (orbit/helper-key
+    ""   '(:ignore t                  :which-key "help")
+    "f"  '(counsel-describe-function  :which-key "Describe function")
+    "v"  '(counsel-describe-variable  :which-key "Describe variable")
+    "s"  '(counsel-describe-symbol    :which-key "Describe symbol")))
 
 (provide 'keybind)
