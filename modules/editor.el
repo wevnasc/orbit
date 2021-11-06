@@ -1,4 +1,11 @@
 ;;; editor.el -*- lexical-binding: t; -*-
+
+;; Disable backup files
+(setq make-backup-files nil)
+
+;; Disable to lockfiles
+(setq create-lockfiles nil)
+
 (use-package evil
   :init
   (setq evil-want-integration t)
