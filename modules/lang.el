@@ -14,8 +14,6 @@
 
 ;; LSP
 (use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-l")
   :commands (lsp lsp-deferred)
   :config
   (setq lsp-headerline-breadcrumb-enable nil
@@ -24,10 +22,10 @@
   (lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
-  :after lsp
-  :commands lsp-ui-mode
+  :hook (lsp-mode . lsp-ui-mode)
   :config
-  (setq lsp-ui-doc-delay 3))
+  (setq lsp-ui-doc-delay 5
+	lsp-ui-doc-position 'at-point))
 
 (use-package lsp-ivy
   :after lsp
@@ -38,6 +36,7 @@
 
 ;; Flycheck
 (use-package flycheck
+  :after lsp
   :commands flycheck-mode
   :hook (prog-mode . flycheck-mode)
   :config
