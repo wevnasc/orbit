@@ -67,4 +67,31 @@
         company-tooltip-flip-when-above t
         company-transformers '(company-sort-by-occurrence)))
 
+
+(defun orbit/replace-org-list-char ()
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•")))))))
+
+(defun orbit/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1))
+
+(use-package org
+  :defer t
+  :pin org
+  :hook (org-mode . orbit/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"
+	org-hide-emphasis-markers t
+	evil-auto-indent nil)
+  (orbit/replace-org-list-char))
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
 (provide 'editor)
