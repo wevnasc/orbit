@@ -1,0 +1,721 @@
+* Orbit Config File
+
+  This is my personal config file for emacs
+
+* Performace Setup
+
+#+begin_src emacs-lisp
+(setq gc-cons-threshold (* 50 1000 1000))
+
+(defun efs/display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                     (time-subtract after-init-time before-init-time)))
+           (setq gc-cons-threshold (* 2 1000 1000))))
+
+(add-hook 'emacs-startup-hook #'efs/display-startup-time)
+#+end_src
+
+* Custom Configs
+
+#+begin_src emacs-lisp
+(setq orbit/theme           'doom-ayu-mirage
+      orbit/font-family     "Fira Code"
+      orbit/font-size       14
+      orbit/project-folders '("~/dev/nu" "~/dev/projects"))
+#+end_src
+
+* Package Setup
+** Install use-package
+
+*use-package* is a package manager from emacs that makes the configuration and installation of packages in emacs a way easier.
+
+#+begin_src emacs-lisp
+;; Initialize package sources
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+end_src
+* Env
+** Load env configurations
+
+It ensures that environment variables inside Emacs will look the same as in the shell.
+
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+end_src
+
+** Disable back and lock files
+
+#+begin_src emacs-lisp
+(setq make-backup-files nil
+      create-lockfiles nil)
+#+end_src
+
+* UI
+** Change default UI settings
+
+This change some native emacs options for a better look and feel
+
+#+begin_src emacs-lisp
+(scroll-bar-mode -1)                      ; Disable visible scrollbar
+(tool-bar-mode -1)                        ; Disable the toolbar
+(tooltip-mode -1)                         ; Disable tooltips
+(set-fringe-mode 10)                      ; Give some breathing room
+(menu-bar-mode -1)                        ; Disable the menu bar
+(global-display-line-numbers-mode t)      ; Enable line numbers
+(show-paren-mode t)                       ; Highlight paren
+(electric-pair-mode 1)                    ; Close pair automatically
+(setq visible-bell nil)                   ; Disable the visible bell
+
+;; Mac OS control to command
+(when (memq window-system '(mac ns x))
+    (setq mac-command-modifier 'control))
+
+#+end_src
+
+** Maximize emacs screen on the start up
+
+#+begin_src emacs-lisp
+(add-hook 'emacs-startup-hook 'toggle-frame-maximized)
+#+end_src
+
+** Disable line numbers for a set of modes
+
+#+begin_src emacs-lisp
+(setq orbit/disable-line-number-for '(org-mode-hook term-mode-hook shell-mode-hook treemacs-mode-hook eshell-mode-hook))
+
+(dolist (current-mode-hook orbit/disable-line-number-for)
+  (add-hook current-mode-hook (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+** Font style
+
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :font orbit/font-family :height (* 10 orbit/font-size))
+(set-face-attribute 'fixed-pitch nil :font orbit/font-family :height (* 10 orbit/font-size))
+(set-face-attribute 'variable-pitch nil :font orbit/font-family :height (* 10 13))
+#+end_src
+
+** Icons
+
+#+begin_src emacs-lisp
+;; do after:  M-x all-the-icons-install-fonts
+(use-package all-the-icons)
+#+end_src
+
+** Modeline
+
+#+begin_src emacs-lisp
+(use-package doom-modeline
+  :init
+  (doom-modeline-mode 1)
+  :custom
+  ((doom-modeline-height 15)))
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :config
+  (load-theme orbit/theme t)
+  (setq doom-themes-enable-bold t    
+        doom-themes-enable-italic t)
+        
+  (doom-themes-visual-bell-config)
+
+  (setq doom-themes-treemacs-theme "doom-colors")  
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
+#+end_src
+
+* Editor
+** Evil
+
+Edit code in the same way that in the vim editor.
+
+#+begin_src emacs-lisp
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "<escape>") 'evil-normal-state)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  ;; Set a default evil mode for some emacs modes
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
+
+;; Set of evil keybinds for many commum packages
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+#+end_src
+
+** Rainbow
+
+Show different colors for each nested parentheses.
+
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+** Paredit
+
+Make easy to edit lisp based languages as clojure and elisp
+
+#+begin_src emacs-lisp
+(use-package paredit
+  :hook
+  (emacs-lisp-mode . paredit-mode)
+  (eval-expression-minibuffer-setup . paredit-mode)
+  (ielm-mode . paredit-mode)
+  (lisp-mode . paredit-mode)
+  (lisp-interaction-mode . paredit-mode)
+  (scheme-mode . paredit-mode)
+  :bind
+  (("M-{" . paredit-wrap-curly)
+   ("M-[" . paredit-wrap-square)
+   ("M-(" . paredit-wrap-round)
+   ("C-<right>" . paredit-forward-slurp-sexp)
+   ("C-<left>" . paredit-forward-barf-sexp)
+   ("C-k" . paredit-kill)
+   ("C-<up>" . paredit-splice-sexp-killing-backward)
+   ("C-<down>" . paredit-splice-sexp-killing-forward)))
+#+end_src
+
+** Expand Reagion
+
+Make easy to select a reagion or specific word.
+
+#+begin_src emacs-lisp
+(use-package expand-region
+  :after evil)
+#+end_src
+
+** Company
+
+Autocomplite package that suggest completitions candidates.
+
+#+begin_src emacs-lisp
+(use-package company
+  :commands global-company-mode
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-tooltip-limit 10
+        company-idle-delay 0.2
+        company-echo-delay 0
+        company-minimum-prefix-length 2
+        company-require-match nil
+        company-selection-wrap-around t
+        company-tooltip-align-annotations t
+        company-tooltip-flip-when-above t
+        company-transformers '(company-sort-by-occurrence)))
+#+end_src
+
+** LSP
+
+Language Server Protocol that supports multiples programming languages.
+
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil
+	lsp-modeline-diagnostics-enable t
+	lsp-lens-enable t)
+  (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-doc-delay 5
+	lsp-ui-doc-position 'at-point))
+
+(use-package lsp-ivy
+  :after lsp
+  :commands lsp-ivy-workspace-symbol)
+
+(use-package lsp-treemacs
+  :after lsp)
+#+end_src
+
+** Flycheck
+
+It Checks problems on the code on the fly during the development.
+
+#+begin_src emacs-lisp
+(use-package flycheck
+  :after lsp
+  :commands flycheck-mode
+  :hook (prog-mode . flycheck-mode)
+  :config
+  (defalias 'flycheck-show-error-at-point-soon 'flycheck-show-error-at-point))
+
+(use-package flycheck-popup-tip
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-popup-tip-mode))
+
+(use-package flycheck-clj-kondo
+  :after flycheck)
+#+end_src
+
+* Org
+** Snippets
+
+It create shortcuts to generate src block on the org mode just typing and pressing TAB.
+eg: *<shortcut TAB*
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("clj" . "src clojure")))
+#+end_src
+** Config
+
+#+begin_src emacs-lisp
+(defun orbit/replace-org-list-char ()
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•")))))))
+
+(defun orbit/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1))
+
+(use-package org
+  :after evil
+  :defer t
+  :pin org
+  :hook (org-mode . orbit/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"
+	org-hide-emphasis-markers t
+	org-src-tab-acts-natively t
+	org-src-fontify-natively t
+	org-src-preserve-indentation t)
+  (orbit/replace-org-list-char))
+
+#+end_src
+
+** Bullets
+
+This allows replacing the headers from org-mode to display a different char for each header level.
+
+#+begin_src emacs-lisp
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+
+* Project Management
+** Projectile
+
+It Helps to manager workspaces for each project
+
+#+begin_src emacs-lisp
+(use-package projectile
+  :diminish projectile-mode
+  :config
+  (projectile-mode)
+  :custom
+  ((projectile-completion-system 'ivy))
+  :init
+  (->> orbit/project-folders
+       (seq-filter 'file-directory-p)
+       (setq projectile-project-search-path))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :after (counsel projectile)
+  :config
+  (counsel-projectile-mode))
+#+end_src
+** Treemacs
+
+Show a buffer with the project folder tree on the left side
+
+#+begin_src emacs-lisp
+(defun orbit/treemacs-toggle ()
+  (interactive)
+  (if (and (fboundp 'treemacs-current-visibility)
+                      (eq (treemacs-current-visibility) 'visible))
+    (treemacs)
+    (treemacs-display-current-project-exclusively)))
+
+(defun orbit/treemacs-show-current-project ()
+  (interactive)
+  (when (and (fboundp 'treemacs-current-visibility)
+                      (eq (treemacs-current-visibility) 'visible)) 
+    (treemacs-display-current-project-exclusively)))
+
+(use-package treemacs
+  :defer t
+  :hook (projectile-after-switch-project . orbit/treemacs-show-current-project)
+  :config
+  (setq treemacs-collapse-dirs              0
+        treemacs-silent-refresh             t
+        treemacs-is-never-other-window      t)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode 'always))
+
+(use-package treemacs-evil
+  :after (treemacs evil))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
+
+(use-package treemacs-magit
+  :after (treemacs magit))
+#+end_src
+
+* Search
+** Counsel
+
+#+begin_src emacs-lisp
+(use-package counsel
+  :bind
+  (("C-x C-f" . counsel-find-file)
+   ("M-x" . counsel-M-x)
+   :map minibuffer-local-map
+   ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (counsel-mode 1))
+#+end_src
+** Ivy
+
+Generic completition mechanism for emacs
+
+#+begin_src emacs-lisp
+(use-package ivy
+  :diminish
+  :commands counsel-M-x
+  :bind
+  (("C-s" . swiper)
+   :map ivy-minibuffer-map
+   ("TAB" . ivy-alt-done)
+   ("C-l" . ivy-alt-done)
+   ("C-j" . ivy-next-line)
+   ("C-k" . ivy-previous-line)
+   :map ivy-switch-buffer-map
+   ("C-k" . ivy-previous-line)
+   ("C-l" . ivy-done)
+   ("C-d" . ivy-switch-buffer-kill)
+   :map ivy-reverse-i-search-map
+   ("C-k" . ivy-previous-line)
+   ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+;; Completition improvements
+(use-package ivy-rich
+  :after ivy
+  :init
+  (ivy-rich-mode 1))
+
+(use-package ivy-prescient
+  :after ivy
+  :config
+  (ivy-prescient-mode 1))
+
+;; Make easy to find shortcuts
+(use-package which-key
+  :defer 0
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 1))
+#+end_src
+
+* Programming Languages
+** Clojure
+#+begin_src emacs-lisp
+(use-package clojure-mode
+  :defer t
+  :hook (clojure-mode . lsp-deferred))
+
+(use-package cider
+  :commands cider-mode
+  :hook
+  (clojure-mode . cider-mode)
+  :config
+  (setq cider-repl-use-clojure-font-lock t))
+#+end_src
+* Source Control
+** Magit
+
+Visual git manager.
+
+#+begin_src emacs-lisp
+(use-package magit
+  :commands magit-status
+  :custom
+  ;; opens magit in the current window
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+#+end_src
+* Tools
+** Helpful
+
+Display the elisp documentation in a better way and with more information
+
+#+begin_src emacs-lisp
+(use-package helpful
+  :commands
+  (helpful-callable helpful-variable helpful-command helpful-key)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+#+end_src
+
+* Keybinds
+** Setup
+#+begin_src emacs-lisp
+(use-package general
+  :after evil)
+#+end_src
+** Global
+#+begin_src emacs-lisp
+(general-define-key
+ "C-+" 'text-scale-increase
+ "C-_" 'text-scale-decrease
+ "C-/" 'comment-line
+ "<escape>" 'keyboard-escape-quit)
+
+(general-define-key
+ :keymaps 'transient-base-map
+ "<escape>" 'transient-quit-one)
+
+(general-define-key
+ :keymaps 'evil-normal-state-map 
+ "gd"     '(lsp-ui-peek-find-definitions :which-key "Find definition")
+ "gD"     '(lsp-ui-peek-find-references  :which-key "Find references"))
+#+end_src
+** Leader
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/leader-key
+    :states '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix "SPC")
+
+(orbit/leader-key
+    :keymaps 'treemacs-mode-map
+    "w"  '(evil-window-map       :which-key "window")
+    "wd" '(evil-window-delete    :which-key "Delete window"))
+
+(orbit/leader-key
+    "."  '(coursel-find-file     :which-key "Find file")
+    ","  '(switch-to-buffer      :which-key "Switch buffer")
+    "s"  '(:ignore t             :which-key "search")
+    "sp" '(counsel-projectile-rg :which-key "Search in the project")
+    "v"  '(er/expand-region      :which-key "Expand reagion")
+    "w"  '(evil-window-map       :which-key "window")
+    "wd" '(evil-window-delete    :which-key "Delete window"))
+#+end_src
+
+** Project
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/project-key
+    :states '(normal visual emacs treemacs)
+    :prefix "SPC p")
+
+(orbit/project-key
+  ""  '(:ignore t                                  :which-key "project")
+  "!" '(projectile-run-shell-command-in-root       :which-key "Run cmd in project root")
+  "&" '(projectile-run-async-shell-command-in-root :which-key "Async cmd in project root")
+  "a" '(projectile-add-known-project               :which-key "Add new project")
+  "b" '(projectile-switch-to-buffer                :which-key "Switch to project buffer")
+  "c" '(projectile-compile-project                 :which-key "Compile in project")
+  "C" '(projectile-repeat-last-command             :which-key "Repeat last command")
+  "d" '(projectile-remove-known-project            :which-key "Remove known project")
+  "e" '(projectile-edit-dir-locals                 :which-key "Edit project .dir-locals")
+  "f" '(projectile-find-file                       :which-key "Find file in project")
+  "g" '(projectile-configure-project               :which-key "Configure project")
+  "i" '(projectile-invalidate-cache                :which-key "Invalidate project cache")
+  "k" '(projectile-kill-buffers                    :which-key "Kill project buffers")
+  "o" '(projectile-find-other-file                 :which-key "Find other file")
+  "p" '(projectile-command-map                     :which-key "projectile commands")
+  "p" '(projectile-switch-project                  :which-key "Switch project")
+  "r" '(projectile-recentf                         :which-key "Find recent project files")
+  "R" '(projectile-run-project                     :which-key "Run project")
+  "s" '(projectile-save-project-buffers            :which-key "Save project files")
+  "T" '(projectile-test-project                    :which-key "Test project"))
+#+end_src
+
+** Buffer
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/buffer-key
+    :states '(normal visual emacs treemacs)
+    :prefix "SPC b")
+
+(orbit/buffer-key
+  ""  '(:ignore t           :which-key "buffer")
+  "[" '(previous-buffer     :which-key "Previous buffer")
+  "]" '(next-buffer         :which-key "Next buffer")
+  "b" '(switch-to-buffer    :which-key "Switch buffer")
+  "d" '(kill-current-buffer :which-key "Kill buffer")
+  "i" '(ibuffer             :which-key "ibuffer")
+  "k" '(kill-current-buffer :which-key "Kill buffer")
+  "n" '(next-buffer         :which-key "Next buffer")
+  "N" '(evil-buffer-new     :which-key "New buffer")
+  "p" '(previous-buffer     :which-key "Previous buffer"))
+#+end_src
+
+** LSP
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/lsp-key
+    :states  '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix  "SPC c")
+
+(orbit/lsp-key
+  :keymaps 'lsp-mode-map
+  ""   '(:ignore t                    :which-key "lsp")
+  "a"  '(lsp-execute-code-action      :which-key "Code action")
+  "d"  '(lsp-doctor                   :which-key "Doctor")
+  "f"  '(:ignore t                    :which-key "format")
+  "fr" '(lsp-format-region            :which-key "Format region")
+  "fb" '(lsp-format-buffer            :which-key "Format buffer")
+  "h"  '(lsp-describe-thing-at-point  :which-key "Documentation")
+  "o"  '(lsp-organize-imports         :which-key "Organize imports")
+  "o"  '(lsp-organize-imports         :which-key "Organize imports")
+  "r"  '(lsp-rename                   :which-key "Rename")
+  "s"  '(:ignore t                    :which-key "server")
+  "ss" '(lsp                          :which-key "Start")
+  "sk" '(lsp-disconect                :which-key "Disconect")
+  "sd" '(lsp-describe-session         :which-key "Describe session"))
+#+end_src
+
+** Programming languages
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/language-key
+    :states  '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix  "SPC m")
+#+end_src
+
+*** Cider
+
+#+begin_src emacs-lisp
+(orbit/language-key
+  :keymaps 'cider-mode-map
+  "e"  '(:ignore t                                   :which-key "eval")
+  "ea" '(cider-eval-all-files                        :which-key "Evaluate all files")
+  "eb" '(cider-eval-buffer                           :which-key "Evaluate buffer")
+  "er" '(cider-eval-region                           :which-key "Evaluate region")
+  "ee" '(cider-eval-last-sexp                        :which-key "Evaluate last expression")
+  "l"  '(:ignore t                                   :which-key "load")
+  "lb" '(cider-load-buffer                           :which-key "Load buffer")
+  "ls" '(cider-load-buffer-and-switch-to-repl-buffer :which-key "Loan buffer on repl")
+  "la" '(cider-load-all-files                        :which-key "Load all files")
+  "r"  '(:ignore t                                   :which-key "repl")
+  "rb" '(cider-switch-to-repl-buffer                 :which-key "Switch to repl buffer")
+  "rq" '(cider-quit                                  :which-key "Kill repl buffer")
+  "t"  '(:ignore t                                   :which-key "test")
+  "tt" '(cider-test-run-test                         :which-key "Run tests")
+  "tr" '(cider-test-rerun-failed-tests               :which-key "Re run failed tests")
+  "tn" '(cider-test-run-ns-tests                     :which-key "Run namespace tests")
+  "tp" '(cider-test-run-project-tests                :which-key "Run project tests")
+  "tl" '(cider-test-run-loaded-tests                 :which-key "Run loaded tests"))
+
+(orbit/language-key
+  "j"  '(:ignore t                                   :which-key "jack")
+  "ji" '(cider-jack-in                               :which-key "Start repl")
+  "jj" '(cider-jack-in-clj                           :which-key "Start clojure repl")
+  "jI" '(cider-jack-in-cljs                          :which-key "Start clojurescript repl")
+  "jJ" '(cider-jack-in-clj&cljs                      :which-key "Start clojure and clojurescript repl"))
+
+(orbit/language-key
+  :keymaps 'cider-repl-mode-map 
+  "r"  '(:ignore t                                   :which-key "repl")
+  "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer"))
+#+end_src
+
+** Git
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/git-key
+    :states '(normal visual emacs treemacs)
+    :prefix "SPC g")
+#+end_src
+
+*** Magit
+#+begin_src emacs-lisp
+
+
+(orbit/git-key
+  ""  '(:ignore t    :which-key "git")
+  "g" '(magit-status :which-key "Git status"))
+#+end_src
+
+** Tools
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/tools-key
+    :states '(normal visual emacs treemacs)
+    :prefix "SPC t")
+
+(general-create-definer orbit/open-key
+    :states  '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix  "SPC o")
+
+(general-create-definer orbit/helper-key
+    :states  '(normal visual emacs treemacs)
+    :prefix  "SPC h")
+
+(orbit/tools-key
+  ""   '(:ignore t             :which-key "tools")
+  "t"  '(counsel-load-theme    :which-key "Load theme"))
+
+(orbit/open-key
+    "p"   '(orbit/treemacs-toggle                       :which-key "Toggle project sidebar"))
+
+(orbit/helper-key
+    ""   '(:ignore t                  :which-key "help")
+    "f"  '(counsel-describe-function  :which-key "Describe function")
+    "v"  '(counsel-describe-variable  :which-key "Describe variable")
+    "s"  '(counsel-describe-symbol    :which-key "Describe symbol"))
+#+end_src
+
