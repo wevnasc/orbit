@@ -599,10 +599,9 @@ Display the elisp documentation in a better way and with more information
  "<escape>" 'transient-quit-one)
 
 (general-define-key
- :keymaps 'lsp-mode-map
- [remap evil-goto-defintion]          'lsp-ui-peek-find-definitions
- "gD"     '(lsp-ui-peek-find-references  :which-key "Find references")
- "gd"     '(lsp-ui-peek-find-definitions :which-key "Find definitions"))
+ :keymaps 'evil-normal-state-map
+ "gD"     '(xref-find-references  :which-key "Find references")
+ "gd"     '(xref-find-definitions :which-key "Find definitions"))
 #+end_src
 ** Leader
 
@@ -701,6 +700,11 @@ Display the elisp documentation in a better way and with more information
   "ss" '(lsp                          :which-key "Start")
   "sk" '(lsp-disconect                :which-key "Disconect")
   "sd" '(lsp-describe-session         :which-key "Describe session"))
+
+(general-define-key
+ :keymaps 'lsp-ui-mode-map
+ [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+ [remap xref-find-references]  'lsp-ui-peek-find-references)
 #+end_src
 
 ** Programming languages
