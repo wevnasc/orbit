@@ -604,6 +604,19 @@ Display the elisp documentation in a better way and with more information
  "gD"     '(lsp-ui-peek-find-references  :which-key "Find references")
  "gd"     '(lsp-ui-peek-find-definitions :which-key "Find definitions"))
 #+end_src
+** Bookmark
+#+begin_src emacs-lisp
+(general-create-definer orbit/bookmark-key
+    :states '(normal visual emacs)
+    :keymaps 'override
+    :prefix "SPC f")
+
+(orbit/bookmark-key
+    ""   '(:ignore t          :which-key "bookmark")
+    "a"  '(bookmark-set       :which-key "Add bookmark")
+    "d"  '(bookmark-delete    :which-key "Delete bookmark")
+    "f"  '(bookmark-jump      :which-key "Jump to bookmark"))
+#+end_src
 ** Leader
 
 #+begin_src emacs-lisp
