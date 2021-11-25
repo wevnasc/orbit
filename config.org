@@ -52,7 +52,6 @@
 #+end_src
 * Custom Commands
 ** Treemacs
-
 #+begin_src emacs-lisp
 (defun orbit/treemacs-toggle ()
   (interactive)
@@ -66,6 +65,13 @@
   (when (and (fboundp 'treemacs-current-visibility)
                       (eq (treemacs-current-visibility) 'visible)) 
     (treemacs-display-current-project-exclusively)))
+#+end_src
+** Cider
+#+begin_src emacs-lisp
+(defun orbit/cider-quit ()
+  (interactive)
+  (cider-quit)
+  (cider-mode))
 #+end_src
 
 * Env
@@ -529,7 +535,6 @@ Generic completition mechanism for emacs
 
 * Programming Languages
 ** Clojure
-
 *** Mode
 #+begin_src emacs-lisp
 (use-package clojure-mode
@@ -750,7 +755,7 @@ Display the elisp documentation in a better way and with more information
   "la" '(cider-load-all-files                        :which-key "Load all files")
   "r"  '(:ignore t                                   :which-key "repl")
   "rb" '(cider-switch-to-repl-buffer                 :which-key "Switch to repl buffer")
-  "rq" '(cider-quit                                  :which-key "Kill repl buffer")
+  "rq" '(orbit/cider-quit                            :which-key "Kill repl buffer")
   "t"  '(:ignore t                                   :which-key "test")
   "tt" '(cider-test-run-test                         :which-key "Run tests")
   "tr" '(cider-test-rerun-failed-tests               :which-key "Re run failed tests")
@@ -803,7 +808,7 @@ Display the elisp documentation in a better way and with more information
     :prefix  "SPC o")
 
 (orbit/open-key
-    "p"   '(orbit/treemacs-toggle                       :which-key "Toggle project sidebar"))
+    "p"   '(orbit/treemacs-toggle :which-key "Toggle project sidebar"))
 #+end_src
 
 ** Tools
