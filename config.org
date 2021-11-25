@@ -23,7 +23,7 @@
 (setq orbit/theme           'doom-dark+
       orbit/font-family     "Fira Code"
       orbit/font-size       14
-      orbit/project-folders '("~/dev/nu" "~/dev/projects"))
+      orbit/project-directories '("~/dev/nu" "~/dev/projects"))
 #+end_src
 
 * Package Setup
@@ -171,6 +171,14 @@ This change some native emacs options for a better look and feel
   (doom-themes-org-config))
 #+end_src
 
+* File System
+** Dired
+#+begin_src emacs-lisp
+(when (memq window-system '(mac ns x))       
+  (setq dired-use-ls-dired t
+        insert-directory-program "/usr/local/bin/gls"
+        dired-listing-switches "-aBhl --group-directories-first"))
+#+end_src
 * Editor
 ** Evil
 
@@ -408,7 +416,7 @@ It Helps to manager workspaces for each project
   :custom
   ((projectile-completion-system 'ivy))
   :init
-  (->> orbit/project-folders
+  (->> orbit/project-directories
        (seq-filter 'file-directory-p)
        (setq projectile-project-search-path))
   (setq projectile-switch-project-action #'projectile-dired))
@@ -667,7 +675,7 @@ Display the elisp documentation in a better way and with more information
   "k" '(projectile-kill-buffers                    :which-key "Kill project buffers")
   "o" '(projectile-find-other-file                 :which-key "Find other file")
   "p" '(projectile-command-map                     :which-key "projectile commands")
-  "p" '(projectile-switch-project                  :which-key "Switch project")
+  "p" '(counsel-projectile-switch-project          :which-key "Switch project")
   "r" '(projectile-recentf                         :which-key "Find recent project files")
   "R" '(projectile-run-project                     :which-key "Run project")
   "s" '(projectile-save-project-buffers            :which-key "Save project files")
