@@ -20,7 +20,7 @@
 * Custom Configs
 
 #+begin_src emacs-lisp
-(setq orbit/theme           'doom-dark+
+(setq orbit/theme           'doom-horizon
       orbit/font-family     "Fira Code"
       orbit/font-size       14
       orbit/project-directories '("~/dev/nu" "~/dev/projects"))
@@ -170,7 +170,6 @@ This change some native emacs options for a better look and feel
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 #+end_src
-
 * File System
 ** Dired
 #+begin_src emacs-lisp
@@ -604,6 +603,8 @@ Display the elisp documentation in a better way and with more information
 (general-define-key
  "C-+" 'text-scale-increase
  "C-_" 'text-scale-decrease
+ "C->" 'evil-window-increase-width
+ "C-<" 'evil-window-decrease-width
  "C-/" 'comment-line
  "<escape>" 'keyboard-escape-quit)
 
@@ -615,6 +616,42 @@ Display the elisp documentation in a better way and with more information
  :keymaps 'evil-normal-state-map
  "gD"     '(xref-find-references  :which-key "Find references")
  "gd"     '(xref-find-definitions :which-key "Find definitions"))
+#+end_src
+** Leader
+
+#+begin_src emacs-lisp
+(general-create-definer orbit/leader-key
+    :states '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix "SPC")
+
+(orbit/leader-key
+    "."  '(coursel-find-file     :which-key "Find file")
+    ","  '(switch-to-buffer      :which-key "Switch buffer")
+    "s"  '(:ignore t             :which-key "Search")
+    "sp" '(counsel-projectile-rg :which-key "Search in the project")
+    "v"  '(er/expand-region      :which-key "Expand reagion"))
+#+end_src
+
+** Window
+#+begin_src emacs-lisp
+(general-create-definer orbit/window-key
+    :states '(normal visual emacs treemacs)
+    :keymaps 'override
+    :prefix "SPC w")
+
+(orbit/window-key
+    ""        '(:ignore t             :which-key "window")
+    "="       '(balance-windows       :which-key "Balance Windows")
+    "w"       '(ace-window            :which-key "Select window")
+    "d"       '(evil-window-delete    :which-key "Delete window")
+    "s"       '(evil-window-split     :which-key "Split Horizontally")
+    "v"       '(evil-window-vsplit    :which-key "Split Vertically")
+    "l"       '(evil-window-right     :which-key "Move to right")
+    "h"       '(evil-window-left      :which-key "Move to left")
+    "k"       '(evil-window-up        :which-key "Move to up")
+    "j"       '(evil-window-down      :which-key "Move to down")
+    "m"       '(delete-other-windows  :which-key "Maximize"))
 #+end_src
 ** Bookmark
 #+begin_src emacs-lisp
@@ -629,29 +666,6 @@ Display the elisp documentation in a better way and with more information
     "d"  '(bookmark-delete    :which-key "Delete bookmark")
     "f"  '(bookmark-jump      :which-key "Jump to bookmark"))
 #+end_src
-** Leader
-
-#+begin_src emacs-lisp
-(general-create-definer orbit/leader-key
-    :states '(normal visual emacs treemacs)
-    :keymaps 'override
-    :prefix "SPC")
-
-(orbit/leader-key
-    :keymaps 'treemacs-mode-map
-    "w"  '(evil-window-map       :which-key "window")
-    "wd" '(evil-window-delete    :which-key "Delete window"))
-
-(orbit/leader-key
-    "."  '(coursel-find-file     :which-key "Find file")
-    ","  '(switch-to-buffer      :which-key "Switch buffer")
-    "s"  '(:ignore t             :which-key "search")
-    "sp" '(counsel-projectile-rg :which-key "Search in the project")
-    "v"  '(er/expand-region      :which-key "Expand reagion")
-    "w"  '(evil-window-map       :which-key "window")
-    "wd" '(evil-window-delete    :which-key "Delete window"))
-#+end_src
-
 ** Project
 
 #+begin_src emacs-lisp
