@@ -20,7 +20,7 @@
 * Custom Configs
 
 #+begin_src emacs-lisp
-(setq orbit/theme           'doom-horizon
+(setq orbit/theme           'brin
       orbit/font-family     "Fira Code"
       orbit/font-size       14
       orbit/project-directories '("~/dev/nu" "~/dev/projects"))
@@ -157,6 +157,8 @@ This change some native emacs options for a better look and feel
 
 ** Theme
 
+*** Doom
+
 #+begin_src emacs-lisp
 (use-package doom-themes
   :config
@@ -170,6 +172,13 @@ This change some native emacs options for a better look and feel
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 #+end_src
+
+*** Sublime
+
+#+begin_src emacs-lisp
+(use-package sublime-themes)
+#+end_src
+
 * File System
 ** Dired
 #+begin_src emacs-lisp
@@ -200,7 +209,10 @@ Edit code in the same way that in the vim editor.
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal))
 #+end_src
-
+** Evil Multiedit
+#+begin_src emacs-lisp
+(use-package evil-multiedit)
+#+end_src
 ** Evil collection
 
 Set of evil keybinds for many commum packages
@@ -297,7 +309,8 @@ Language Server Protocol that supports multiples programming languages.
   :hook (lsp-mode . lsp-ui-mode)
   :config
   (setq lsp-ui-doc-delay 5
-	lsp-ui-doc-position 'at-point))
+	      lsp-ui-doc-position 'at-point
+        lsp-ui-sideline-show-code-actions nil))
 #+end_src
 
 *** Ivy
@@ -380,8 +393,7 @@ eg: *<shortcut TAB*
   :pin org
   :hook (org-mode . orbit/org-mode-setup)
   :config
-  (setq org-ellipsis " ▾"
-	org-hide-emphasis-markers t
+  (setq org-hide-emphasis-markers t
 	org-src-tab-acts-natively t
 	org-src-fontify-natively t
 	org-src-preserve-indentation t)
@@ -611,11 +623,22 @@ Display the elisp documentation in a better way and with more information
 (general-define-key
  :keymaps 'transient-base-map
  "<escape>" 'transient-quit-one)
+#+end_src
 
+*** Evil multi edit
+#+begin_src emacs-lisp
 (general-define-key
  :keymaps 'evil-normal-state-map
- "gD"     '(xref-find-references  :which-key "Find references")
- "gd"     '(xref-find-definitions :which-key "Find definitions"))
+ "M-d"    '(evil-multiedit-match-and-next        :which-key "Mult select next")
+ "M-D"    '(evil-multiedit-match-symbol-and-prev :which-key "Mult select prev"))
+#+end_src
+
+*** LSP
+#+begin_src emacs-lisp
+(general-define-key
+ :keymaps 'evil-normal-state-map
+ "gD"     '(xref-find-references          :which-key "Find references")
+ "gd"     '(xref-find-definitions         :which-key "Find definitions"))
 #+end_src
 ** Leader
 
@@ -643,7 +666,9 @@ Display the elisp documentation in a better way and with more information
 (orbit/window-key
     ""        '(:ignore t             :which-key "window")
     "="       '(balance-windows       :which-key "Balance Windows")
-    "w"       '(ace-window            :which-key "Select window")
+    "a"       '(ace-window            :which-key "select window")
+    "w"       '(evil-window-next      :which-key "Next window")
+    "p"       '(evil-window-prev      :which-key "Prev window")
     "d"       '(evil-window-delete    :which-key "Delete window")
     "s"       '(evil-window-split     :which-key "Split Horizontally")
     "v"       '(evil-window-vsplit    :which-key "Split Vertically")
@@ -743,7 +768,7 @@ Display the elisp documentation in a better way and with more information
 
 (general-define-key
  :keymaps 'lsp-ui-mode-map
- [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+ [remap xref-find-definitions] 'lsp-find-definition
  [remap xref-find-references]  'lsp-ui-peek-find-references)
 #+end_src
 
@@ -789,6 +814,10 @@ Display the elisp documentation in a better way and with more information
   :keymaps 'cider-repl-mode-map 
   "r"  '(:ignore t                                   :which-key "repl")
   "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer"))
+
+(general-define-key
+ :keymaps 'cider-mode-map
+ [remap xref-find-definitions] 'lsp-find-definition)
 #+end_src
 
 ** Git
