@@ -73,6 +73,15 @@
   (cider-quit)
   (cider-mode))
 #+end_src
+** Editor
+#+begin_src emacs-lisp
+(defun orbit/format-buffer ()
+   (interactive)
+   (whitespace-cleanup)
+   (when (bound-and-true-p lsp-mode)
+         (lsp-format-buffer)
+         (lsp-organize-imports)))
+#+end_src
 
 * Env
 ** Load env configurations
@@ -357,6 +366,11 @@ It Checks problems on the code on the fly during the development.
 #+begin_src emacs-lisp
 (use-package flycheck-clj-kondo
   :after flycheck)
+#+end_src
+
+** Custom Hooks
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'orbit/format-buffer)
 #+end_src
 
 * Org
