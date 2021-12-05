@@ -64,7 +64,7 @@
 (defun orbit/treemacs-show-current-project ()
   (interactive)
   (when (and (fboundp 'treemacs-current-visibility)
-                      (eq (treemacs-current-visibility) 'visible)) 
+                      (eq (treemacs-current-visibility) 'visible))
     (treemacs-display-current-project-exclusively)))
 #+end_src
 ** Cider
@@ -173,12 +173,12 @@ This change some native emacs options for a better look and feel
 (use-package doom-themes
   :config
   (load-theme orbit/theme t)
-  (setq doom-themes-enable-bold t    
+  (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-        
+
   (doom-themes-visual-bell-config)
 
-  (setq doom-themes-treemacs-theme "doom-colors")  
+  (setq doom-themes-treemacs-theme "doom-colors")
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 #+end_src
@@ -192,7 +192,7 @@ This change some native emacs options for a better look and feel
 * File System
 ** Dired
 #+begin_src emacs-lisp
-(when (memq window-system '(mac ns x))       
+(when (memq window-system '(mac ns x))
   (setq dired-use-ls-dired t
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-aBhl --group-directories-first"))
@@ -307,8 +307,8 @@ Language Server Protocol that supports multiples programming languages.
   :commands (lsp lsp-deferred)
   :config
   (setq lsp-headerline-breadcrumb-enable nil
-	lsp-modeline-diagnostics-enable t
-	lsp-lens-enable t)
+        lsp-modeline-diagnostics-enable t
+        lsp-lens-enable t)
   (lsp-enable-which-key-integration t))
 #+end_src
 
@@ -319,7 +319,7 @@ Language Server Protocol that supports multiples programming languages.
   :hook (lsp-mode . lsp-ui-mode)
   :config
   (setq lsp-ui-doc-delay 5
-	      lsp-ui-doc-position 'at-point
+              lsp-ui-doc-position 'at-point
         lsp-ui-sideline-show-code-actions nil))
 #+end_src
 
@@ -409,9 +409,9 @@ eg: *<shortcut TAB*
   :hook (org-mode . orbit/org-mode-setup)
   :config
   (setq org-hide-emphasis-markers t
-	org-src-tab-acts-natively t
-	org-src-fontify-natively t
-	org-src-preserve-indentation t)
+        org-src-tab-acts-natively t
+        org-src-fontify-natively t
+        org-src-preserve-indentation t)
   (orbit/replace-org-list-char))
 
 #+end_src
@@ -651,12 +651,26 @@ Display the elisp documentation in a better way and with more information
  "M-D"    '(evil-multiedit-match-symbol-and-prev :which-key "Mult select prev"))
 #+end_src
 
-*** LSP
+*** Goto
 #+begin_src emacs-lisp
 (general-define-key
  :keymaps 'evil-normal-state-map
- "gD"     '(xref-find-references          :which-key "Find references")
- "gd"     '(xref-find-definitions         :which-key "Find definitions"))
+ :prefix  "g"
+ ""      '(:ignore t             :which-key "goto")
+ "D"     '(xref-find-references  :which-key "Find references")
+ "d"     '(xref-find-definitions :which-key "Find definitions"))
+
+(general-define-key
+ :keymaps 'lsp-ui-mode-map
+ [remap xref-find-references]  'lsp-ui-peek-find-references)
+
+(general-define-key
+ :keymaps 'lsp-mode-map
+ [remap xref-find-definitions] 'lsp-find-definition)
+
+(general-define-key
+ :keymaps 'cider-mode-map
+ [remap cider-find-var]        'lsp-find-definition)
 #+end_src
 ** Leader
 
@@ -829,13 +843,9 @@ Display the elisp documentation in a better way and with more information
   "tl" '(cider-test-run-loaded-tests                 :which-key "Run loaded tests"))
 
 (orbit/language-key
-  :keymaps 'cider-repl-mode-map 
+  :keymaps 'cider-repl-mode-map
   "r"  '(:ignore t                                   :which-key "repl")
   "rc" '(cider-repl-clear-buffer                     :which-key "Clear repl buffer"))
-
-(general-define-key
- :keymaps 'cider-mode-map
- [remap xref-find-definitions] 'lsp-find-definition)
 #+end_src
 
 ** Git
@@ -890,4 +900,3 @@ Display the elisp documentation in a better way and with more information
   ""   '(:ignore t             :which-key "tools")
   "t"  '(counsel-load-theme    :which-key "Load theme"))
 #+end_src
-
