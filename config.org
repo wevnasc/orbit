@@ -20,10 +20,11 @@
 * Custom Configs
 
 #+begin_src emacs-lisp
-(setq orbit/theme           'brin
-      orbit/font-family     "Fira Code"
-      orbit/font-size       14
-      orbit/project-directories '("~/dev/nu" "~/dev/projects"))
+(setq orbit/theme           'modus-vivendi
+      orbit/font-family     "JetBrains Mono"
+      orbit/font-size       15
+      orbit/project-directories '("~/dev/nu" "~/dev/projects")
+      orbit/project-ignore-directories '(".clj-kondo" ".lsp"))
 #+end_src
 
 * Package Setup
@@ -438,6 +439,9 @@ It Helps to manager workspaces for each project
   :diminish projectile-mode
   :config
   (projectile-mode)
+  (dolist (directory orbit/project-ignore-directories)
+    (add-to-list 'projectile-globally-ignored-directories directory))
+  (setq projectile-indexing-method 'native)
   :custom
   ((projectile-completion-system 'ivy))
   :init
